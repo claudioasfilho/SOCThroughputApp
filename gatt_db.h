@@ -20,5 +20,6 @@ extern const struct bg_gattdb_def bg_gattdb_data;
 #define gattdb_throughput_indications          25
 #define gattdb_throughput_write_no_response         28
 #define gattdb_display_refresh                 30
+#define gattdb_TestTime                        32
 
 #endif

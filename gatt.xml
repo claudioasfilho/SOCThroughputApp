@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--Custom BLE GATT--><gatt generic_attribute_service="true" header="gatt_db.h" name="Custom BLE GATT" out="gatt_db.c" prefix="gattdb_">
+<!--Custom BLE GATT-->
+<gatt generic_attribute_service="true" header="gatt_db.h" name="Custom BLE GATT" out="gatt_db.c" prefix="gattdb_">
   
   <!--Generic Access-->
   <service advertise="false" name="Generic Access" requirement="mandatory" sourceId="org.bluetooth.service.generic_access" type="primary" uuid="1800">
@@ -88,6 +89,13 @@
       <informativeText>Custom characteristic</informativeText>
       <value length="1" type="hex" variable_length="false">0x01</value>
       <properties read="true" read_requirement="optional" write_no_response="true" write_no_response_requirement="optional"/>
+    </characteristic>
+    
+    <!--TestTime-->
+    <characteristic id="TestTime" name="TestTime" sourceId="custom.type" uuid="6b2b0a1a-e563-4100-9380-d262edae738e">
+      <informativeText>Custom characteristic</informativeText>
+      <value length="1" type="user" variable_length="false">60</value>
+      <properties read="true" read_requirement="optional" write="true" write_requirement="optional"/>
     </characteristic>
   </service>
 </gatt>

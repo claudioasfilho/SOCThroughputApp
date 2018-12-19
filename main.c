@@ -149,6 +149,7 @@ enum states_enum {idle, transmitting, result};
 /* ---- Application variables ---- */
 enum states_enum state = idle;							// Variable to keep track of states in master side
 uint32_t time_elapsed;									// Variable to calculate time during which there was data tranmission
+uint32_t testTime = 60;                      //Variable that is tied to gattdb_TestTime and holds the Time for the Notifications test (In Seconds)
 const uint8_t displayRefreshOn = 1;						// Turn ON display refresh on master side
 const uint8_t displayRefreshOff = 0;					// Turn OFF display refresh on master side
 uint8_t boot_to_dfu = 0; 								// Flag indicating if device should boot into DFU mode
@@ -999,12 +1000,29 @@ void main(void)
 			}
 		break;
 
+	  case gecko_evt_gatt_server_user_read_request_id:
+	  		if(evt->data.evt_gatt_server_user_read_request.characteristic==gattdb_TestTime)
+	  		{
+	  		  gecko_cmd_gatt_server_send_user_read_response(evt->data.evt_gatt_server_user_read_request.connection , evt->data.evt_gatt_server_user_read_request.characteristic , 0 , sizeof(testTime), (uint8_t const*)&testTime);
+	  		}
+	  		break;
+
+
 		/* Events related to OTA upgrading
       ----------------------------------------------------------------------------- */
 
       /* Check if the user-type OTA Control Characteristic was written.
        * If ota_control was written, boot the device into Device Firmware Upgrade (DFU) mode. */
       case gecko_evt_gatt_server_user_write_request_id:
+
+      if (evt->data.evt_gatt_server_user_write_request.characteristic == gattdb_TestTime) {
+        /* Change Global variable tied to Characteristic */
+         testTime = (uint32_t) evt->data.evt_gatt_server_attribute_value.value.data[0];
+
+        /* Send response to Write Request */
+        gecko_cmd_gatt_server_send_user_write_response( evt->data.evt_gatt_server_user_write_request.connection, gattdb_TestTime, bg_err_success);
+
+      }
 
         if(evt->data.evt_gatt_server_user_write_request.characteristic==gattdb_ota_control)
         {

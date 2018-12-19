@@ -1,5 +1,5 @@
 #ISD afv6
-# Simplicity Studio version: 5.0.0.201811140904-1361
+# Simplicity Studio version: 5.1.1.201812141635-1403
 
 # Application configuration
 stackId: com.silabs.sdk.stack.super
@@ -91,6 +91,11 @@ appPlugin: stack_bridge=false
       <informativeText>Custom characteristic</informativeText>
       <value length="1" type="hex" variable_length="false">0x01</value>
       <properties read="true" read_requirement="optional" write_no_response="true" write_no_response_requirement="optional"/>
+    </characteristic>
+    <characteristic id="TestTime" name="TestTime" sourceId="custom.type" uuid="6b2b0a1a-e563-4100-9380-d262edae738e">
+      <informativeText>Custom characteristic</informativeText>
+      <value length="1" type="user" variable_length="false">60</value>
+      <properties read="true" read_requirement="optional" write="true" write_requirement="optional"/>
     </characteristic>
   </service>
 </gatt>
