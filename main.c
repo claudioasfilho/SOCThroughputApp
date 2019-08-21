@@ -58,6 +58,8 @@
  * @{
  **************************************************************************************************/
 
+#define NODISPLAY
+
 #ifndef MAX_CONNECTIONS
 #define MAX_CONNECTIONS 1
 #endif
@@ -206,6 +208,8 @@ char* indicateString = (char*)indicateDisabledString;
 void displayRefresh()
 {
 
+#ifndef NODISPLAY
+
 	GRAPHICS_Clear();
 
 	GRAPHICS_AppendString(roleString);
@@ -230,6 +234,8 @@ void displayRefresh()
 	//GRAPHICS_AppendString(invalidDataString);
 
 	GRAPHICS_Update();
+
+#endif
 }
 
 
@@ -437,6 +443,8 @@ void main(void)
 	  roleString = (char*)roleMasterString;
   }
 
+
+#ifndef NODISPLAY
   /* Initialize interrupts */
   GPIOINT_Init();
 
@@ -448,6 +456,7 @@ void main(void)
   GPIOINT_CallbackRegister(BSP_BUTTON1_PIN,handle_button_change);
 
   GRAPHICS_Init();
+#endif
 
   while (1) {
     /* Event pointer for handling events */
@@ -732,8 +741,9 @@ void main(void)
 		    		  //sprintf(statusConnectedString+6, "ERR");
 		    	  }
 
+#ifndef NODISPLAY
 		    	  displayRefresh();
-
+#endif
 	    		  //bitsSent = 0;
 				  break;
 
