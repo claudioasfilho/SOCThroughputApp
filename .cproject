@@ -122,6 +122,7 @@
 								<option id="com.silabs.ide.si32.gcc.cdt.managedbuild.tool.gnu.c.linker.clibs.401266268" name="C Library" superClass="com.silabs.ide.si32.gcc.cdt.managedbuild.tool.gnu.c.linker.clibs" value="com.silabs.ide.si32.gcc.cdt.managedbuild.tool.gnu.c.linker.nanospec" valueType="enumerated"/>
 								<option id="gnu.c.link.option.userobjs.713462856" name="Other objects" superClass="gnu.c.link.option.userobjs" valueType="userObjs">
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/protocol/bluetooth/lib/EFR32BG13P/GCC/binapploader.o}"/>
+									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/protocol/bluetooth/lib/EFR32BG13P/GCC/libcoex.a}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/protocol/bluetooth/lib/EFR32BG13P/GCC/libpsstore.a}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/protocol/bluetooth/lib/EFR32BG13P/GCC/libbluetooth.a}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/platform/radio/rail_lib/autogen/librail_release/librail_efr32xg13_gcc_release.a}"/>
