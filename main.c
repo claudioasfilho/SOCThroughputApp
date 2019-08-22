@@ -238,7 +238,79 @@ void displayRefresh()
 #endif
 }
 
+/**************************************************************************//**
+* @brief Function to Enable TX and RX active pins for Coex debugging
+*****************************************************************************/
 
+
+
+// Enable TX_ACT signal through GPIO PD10
+#define _PRS_CH_CTRL_SOURCESEL_RAC2						0x00000020UL
+#define PRS_CH_CTRL_SOURCESEL_RAC2						(_PRS_CH_CTRL_SOURCESEL_RAC2 << 8)
+#define _PRS_CH_CTRL_SIGSEL_RACPAEN						0x00000004UL
+#define PRS_CH_CTRL_SIGSEL_RACPAEN						(_PRS_CH_CTRL_SIGSEL_RACRX << 0)
+#define TX_ACTIVE_PRS_SOURCE							PRS_CH_CTRL_SOURCESEL_RAC2
+#define TX_ACTIVE_PRS_SIGNAL							PRS_CH_CTRL_SIGSEL_RACPAEN
+
+#define TX_ACTIVE_PRS_CHANNEL 							5
+#define TX_ACTIVE_PRS_LOCATION 							0
+#define TX_ACTIVE_PRS_PORT 								gpioPortD
+#define TX_ACTIVE_PRS_PIN 								10
+#define TX_ACTIVE_PRS_ROUTELOC_REG 						ROUTELOC1
+#define TX_ACTIVE_PRS_ROUTELOC_MASK 					(~0x00003F00UL)
+#define TX_ACTIVE_PRS_ROUTELOC_VALUE					PRS_ROUTELOC1_CH5LOC_LOC0 // PD10
+#define TX_ACTIVE_PRS_ROUTEPEN PRS_ROUTEPEN_CH5PEN
+
+// Enable RX_ACT signal through GPIO PD11
+#define _PRS_CH_CTRL_SOURCESEL_RAC2						0x00000020UL
+#define PRS_CH_CTRL_SOURCESEL_RAC2						(_PRS_CH_CTRL_SOURCESEL_RAC2 << 8)
+#define _PRS_CH_CTRL_SIGSEL_RACRX						0x00000002UL
+#define PRS_CH_CTRL_SIGSEL_RACRX						(_PRS_CH_CTRL_SIGSEL_RACRX << 0)
+#define RX_ACTIVE_PRS_SOURCE PRS_CH_CTRL_SOURCESEL_RAC2
+#define RX_ACTIVE_PRS_SIGNAL PRS_CH_CTRL_SIGSEL_RACRX
+
+#define RX_ACTIVE_PRS_CHANNEL							6
+#define RX_ACTIVE_PRS_LOCATION							13
+#define RX_ACTIVE_PRS_PORT								gpioPortD
+#define RX_ACTIVE_PRS_PIN								11
+#define RX_ACTIVE_PRS_ROUTELOC_REG						ROUTELOC1
+#define RX_ACTIVE_PRS_ROUTELOC_MASK						(~0x003F0000UL)
+#define RX_ACTIVE_PRS_ROUTELOC_VALUE					PRS_ROUTELOC1_CH6LOC_LOC13 // PD11
+#define RX_ACTIVE_PRS_ROUTEPEN							PRS_ROUTEPEN_CH6PEN
+
+void initTxRXActive()
+{
+
+	CMU_ClockEnable(cmuClock_PRS, true); // enable clock to PRS
+
+	// Setup PRS input as TX_ACTIVE signal
+	PRS_SourceAsyncSignalSet(TX_ACTIVE_PRS_CHANNEL, TX_ACTIVE_PRS_SOURCE, TX_ACTIVE_PRS_SIGNAL);
+
+	// enable TX_ACTIVE output pin with initial value of 0
+	GPIO_PinModeSet(TX_ACTIVE_PRS_PORT, TX_ACTIVE_PRS_PIN, gpioModePushPull, 0);
+
+	// Route PRS CH/LOC to TX Active GPIO output
+	PRS->TX_ACTIVE_PRS_ROUTELOC_REG = (PRS->TX_ACTIVE_PRS_ROUTELOC_REG &
+	TX_ACTIVE_PRS_ROUTELOC_MASK) | TX_ACTIVE_PRS_ROUTELOC_VALUE;
+	PRS->ROUTEPEN |= TX_ACTIVE_PRS_ROUTEPEN;
+
+	// Setup PRS input as RX_ACTIVE signal
+	PRS_SourceAsyncSignalSet(RX_ACTIVE_PRS_CHANNEL, RX_ACTIVE_PRS_SOURCE, RX_ACTIVE_PRS_SIGNAL);
+
+	// enable RX_ACTIVE output pin with initial value of 0
+	GPIO_PinModeSet(RX_ACTIVE_PRS_PORT, RX_ACTIVE_PRS_PIN, gpioModePushPull, 0);
+
+	// Route PRS CH/LOC to RX Active GPIO output
+	PRS->RX_ACTIVE_PRS_ROUTELOC_REG = (PRS->RX_ACTIVE_PRS_ROUTELOC_REG & RX_ACTIVE_PRS_ROUTELOC_MASK) | RX_ACTIVE_PRS_ROUTELOC_VALUE;
+	PRS->ROUTEPEN |= RX_ACTIVE_PRS_ROUTEPEN;
+
+
+	GPIO_PinModeSet(BSP_COEX_REQ_PORT, BSP_COEX_REQ_PIN, gpioModePushPull, 0);
+	GPIO_PinModeSet(BSP_COEX_GNT_PORT, BSP_COEX_GNT_PIN, gpioModeInput, 0);
+	GPIO_PinModeSet(BSP_COEX_PRI_PORT, BSP_COEX_PRI_PIN, gpioModePushPull, 0);
+
+
+}
 /**************************************************************************//**
 * @brief Function to handle buttons press and release actions
 *****************************************************************************/
@@ -416,6 +488,7 @@ void main(void)
   initBoard();
   // Initialize application
   initApp();
+  initTxRXActive();
 
   // Initialize stack
   gecko_init(&config);
@@ -519,6 +592,7 @@ void main(void)
 			sprintf(maxDataSizeNotificationsString+11, "%03u", maxDataSizeNotifications);
 			sprintf(invalidDataString+9, "%03u", invalidData);
 
+			gecko_cmd_coex_set_options(GECKO_COEX_OPTION_ENABLE, 1);
 			gecko_cmd_gatt_server_write_attribute_value(gattdb_display_refresh, 0, 1, &displayRefreshOn);
 
 			gecko_cmd_gatt_set_max_mtu(250);
